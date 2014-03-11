@@ -10,9 +10,7 @@ import_types_from "distributed_locking/DLM.hpp"
 task_context "DistributedLockingTask" do
     output_port("lettersOut", "/fipa/SerializedLetter").
         doc("Output port for FIPA letters, that will be sent by the MTS").
-        needs_reliable_connection
     input_port("lettersIn", "/fipa/SerializedLetter").
         doc("Input port for FIPA letters from the MTS").
-        needs_reliable_connection
     periodic(0.1)
 end
