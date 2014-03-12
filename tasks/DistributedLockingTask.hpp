@@ -5,6 +5,13 @@
 
 #include "distributed_locking/DistributedLockingTaskBase.hpp"
 
+namespace fipa {
+    namespace distributed_locking {
+        // Forward declare DLM
+        class DLM;
+    }
+}
+
 namespace distributed_locking {
 
     /*! \class DistributedLockingTask 
@@ -25,7 +32,19 @@ namespace distributed_locking {
     {
 	friend class DistributedLockingTaskBase;
     protected:
+        fipa::distributed_locking::DLM* mpDlm;
+        
+        /* Checks if the resource is locked.
+         */
+        virtual bool isLocked(::std::string const & resource);
 
+        /* Tries to lock the resource. isLocked has to be called subsequently to check the status.
+         */
+        virtual void lock(::std::string const & resource);
+
+        /* Unlocks the resource.
+         */
+        virtual void unlock(::std::string const & resource);
 
 
     public:
@@ -104,7 +123,6 @@ namespace distributed_locking {
          */
         void cleanupHook();
     };
-}
-
+} // namespace distributed_locking
 #endif
 
