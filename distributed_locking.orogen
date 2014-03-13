@@ -9,6 +9,11 @@ import_types_from "distributed_locking/Agent.hpp"
 import_types_from "base"
 
 task_context "DistributedLockingTask" do
+    needs_configuration
+    
+    property "self", "fipa/Agent"
+    property "protocol", "fipa/distributed_locking/protocol/Protocol"
+
     output_port("lettersOut", "/fipa/SerializedLetter").
         doc("Output port for FIPA letters, that will be sent by the MTS")
     input_port("lettersIn", "/fipa/SerializedLetter").
@@ -16,7 +21,6 @@ task_context "DistributedLockingTask" do
     port_driven ("lettersIn")
     
     
-    # why isn't list accepted as container type!?
     operation("lock").
         argument("resource", "/std/string/", "the name of the resource").
         argument("agents", "/std/vector</fipa/Agent >", "the agents to communicate with for this lock").
@@ -30,4 +34,16 @@ task_context "DistributedLockingTask" do
         returns("/fipa/distributed_locking/lock_state/LockState").
         argument("resource", "/std/string/", "the name of the resource").
         doc("Gets the lock state for the given resource.")
+    
+    operation("getAgent").
+        returns("fipa/Agent").
+        doc("Returns the agent managed by the underlying dlm.")
+end
+
+deployment "dlm_test" do
+    do_not_install
+    (0..4).each do |i|
+        task("dlm_#{i}", "distributed_locking::DistributedLockingTask")
+        .periodic(0.1) # WHY?
+    end
 end

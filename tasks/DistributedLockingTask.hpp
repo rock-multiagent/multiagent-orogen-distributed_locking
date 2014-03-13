@@ -34,6 +34,10 @@ namespace distributed_locking {
     protected:
         fipa::distributed_locking::DLM* mpDlm;
         
+        /* Returns the agent managed by the underlying dlm.
+         */
+        virtual ::fipa::Agent getAgent();
+        
         /* Gets the lock state for the given resource.
          */
         virtual ::fipa::distributed_locking::lock_state::LockState getLockState(::std::string const & resource);
@@ -52,14 +56,14 @@ namespace distributed_locking {
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
          * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
          */
-        DistributedLockingTask(std::string const& name = "distributed_locking::DistributedLockingTask", TaskCore::TaskState initial_state = Stopped);
+        DistributedLockingTask(std::string const& name = "distributed_locking::DistributedLockingTask");
 
         /** TaskContext constructor for DistributedLockingTask 
          * \param name Name of the task. This name needs to be unique to make it identifiable for nameservices. 
          * \param engine The RTT Execution engine to be used for this task, which serialises the execution of all commands, programs, state machines and incoming events for a task. 
-         * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
+         * 
          */
-        DistributedLockingTask(std::string const& name, RTT::ExecutionEngine* engine, TaskCore::TaskState initial_state = Stopped);
+        DistributedLockingTask(std::string const& name, RTT::ExecutionEngine* engine);
 
         /** Default deconstructor of DistributedLockingTask
          */

@@ -7,24 +7,29 @@
 
 using namespace distributed_locking;
 
-DistributedLockingTask::DistributedLockingTask(std::string const& name, TaskCore::TaskState initial_state)
-    : DistributedLockingTaskBase(name, initial_state)
+DistributedLockingTask::DistributedLockingTask(std::string const& name)
+    : DistributedLockingTaskBase(name)
     , mpDlm(0)
 {
-    // TODO load self (Agent) from configuration file
-    mpDlm = new fipa::distributed_locking::RicartAgrawala();
 }
 
-DistributedLockingTask::DistributedLockingTask(std::string const& name, RTT::ExecutionEngine* engine, TaskCore::TaskState initial_state)
-    : DistributedLockingTaskBase(name, engine, initial_state)
+DistributedLockingTask::DistributedLockingTask(std::string const& name, RTT::ExecutionEngine* engine)
+    : DistributedLockingTaskBase(name, engine)
    , mpDlm(0)
 {
-    mpDlm = new fipa::distributed_locking::RicartAgrawala();
 }
 
 DistributedLockingTask::~DistributedLockingTask()
 {
-    delete mpDlm;
+}
+
+::fipa::Agent DistributedLockingTask::getAgent()
+{
+    // RTT::log(RTT::Warning) << "asdfjkasldj" << RTT::endlog()
+    // in shell:
+    // export ORO_LOGLEVEL=5 
+    // um Info log zu sehen, maximal 6  für Debug
+    return mpDlm->getSelf();
 }
 
 ::fipa::distributed_locking::lock_state::LockState DistributedLockingTask::getLockState(::std::string const & resource)
@@ -52,6 +57,12 @@ bool DistributedLockingTask::configureHook()
 {
     if (! DistributedLockingTaskBase::configureHook())
         return false;
+    
+    fipa::Agent self = _self.get();
+    fipa::distributed_locking::protocol::Protocol protocol = _protocol.get();
+    // TODO choose subclass consequently
+    mpDlm = new fipa::distributed_locking::RicartAgrawala(self); //fipa::distributed_locking::DLM::dlmFactory(protocol, self);//  
+    
     return true;
 }
 bool DistributedLockingTask::startHook()
@@ -102,4 +113,6 @@ void DistributedLockingTask::stopHook()
 void DistributedLockingTask::cleanupHook()
 {
     DistributedLockingTaskBase::cleanupHook();
+    
+    delete mpDlm;
 }
