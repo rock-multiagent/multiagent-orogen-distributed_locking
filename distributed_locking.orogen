@@ -44,6 +44,6 @@ deployment "dlm_test" do
     do_not_install
     (0..4).each do |i|
         task("dlm_#{i}", "distributed_locking::DistributedLockingTask")
-        .periodic(0.1) # WHY?
+        #.periodic(0.1) # WHY?
     end
 end

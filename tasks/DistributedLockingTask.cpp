@@ -39,8 +39,10 @@ DistributedLockingTask::~DistributedLockingTask()
 
 void DistributedLockingTask::lock(::std::string const & resource, ::std::vector< ::fipa::Agent > const & agents)
 {
+    RTT::log(RTT::Warning) << getAgent().identifier << " lock start" << RTT::endlog();
     mpDlm->lock(resource, std::list<fipa::Agent> (agents.begin(), agents.end()));
     trigger();
+    RTT::log(RTT::Warning) << getAgent().identifier << " lock end" << RTT::endlog();
 }
 
 void DistributedLockingTask::unlock(::std::string const & resource)
@@ -60,8 +62,7 @@ bool DistributedLockingTask::configureHook()
     
     fipa::Agent self = _self.get();
     fipa::distributed_locking::protocol::Protocol protocol = _protocol.get();
-    // TODO choose subclass consequently
-    mpDlm = new fipa::distributed_locking::RicartAgrawala(self); //fipa::distributed_locking::DLM::dlmFactory(protocol, self);//  
+    mpDlm = fipa::distributed_locking::DLM::dlmFactory(protocol, self);
     
     return true;
 }
@@ -75,6 +76,20 @@ bool DistributedLockingTask::startHook()
 void DistributedLockingTask::updateHook()
 {
     DistributedLockingTaskBase::updateHook();
+    RTT::log(RTT::Warning) << getAgent().identifier << " uH start" << RTT::endlog();
+    
+    // Check if there is something on the input port
+    fipa::SerializedLetter letterIn;
+    while(_lettersIn.read(letterIn) == RTT::NewData)
+    {
+        // Convert back
+        fipa::acl::ACLEnvelope envelopeIn = letterIn.deserialize();
+        fipa::acl::ACLMessage msgIn = envelopeIn.getACLMessage();
+        
+        // Forward message to DLM
+        mpDlm->onIncomingMessage(msgIn);
+        RTT::log(RTT::Warning) << getAgent().identifier << " uH in" << RTT::endlog();
+    }
     
     // Get message from DLM if there is one
     while(mpDlm->hasOutgoingMessages())
@@ -88,19 +103,10 @@ void DistributedLockingTask::updateHook()
         
         // Push to output port
         _lettersOut.write(letterOut);
+        RTT::log(RTT::Warning) << getAgent().identifier << " uH out" << RTT::endlog();
     }
     
-    // Check if there is something on the input port
-    fipa::SerializedLetter letterIn;
-    while(_lettersIn.read(letterIn) == RTT::NewData)
-    {
-        // Convert back
-        fipa::acl::ACLEnvelope envelopeIn = letterIn.deserialize();
-        fipa::acl::ACLMessage msgIn = envelopeIn.getACLMessage();
-        
-        // Forward message to DLM
-        mpDlm->onIncomingMessage(msgIn);
-    }    
+    RTT::log(RTT::Warning) << getAgent().identifier << " uH end" << RTT::endlog();
 }
 void DistributedLockingTask::errorHook()
 {
