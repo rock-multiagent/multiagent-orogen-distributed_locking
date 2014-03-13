@@ -34,13 +34,13 @@ namespace distributed_locking {
     protected:
         fipa::distributed_locking::DLM* mpDlm;
         
-        /* Checks if the resource is locked.
+        /* Gets the lock state for the given resource.
          */
-        virtual bool isLocked(::std::string const & resource);
+        virtual ::fipa::distributed_locking::lock_state::LockState getLockState(::std::string const & resource);
 
         /* Tries to lock the resource. isLocked has to be called subsequently to check the status.
          */
-        virtual void lock(::std::string const & resource);
+        virtual void lock(::std::string const & resource, ::std::vector< ::fipa::Agent > const & agents);
 
         /* Unlocks the resource.
          */

@@ -11,6 +11,7 @@ DistributedLockingTask::DistributedLockingTask(std::string const& name, TaskCore
     : DistributedLockingTaskBase(name, initial_state)
     , mpDlm(0)
 {
+    // TODO load self (Agent) from configuration file
     mpDlm = new fipa::distributed_locking::RicartAgrawala();
 }
 
@@ -26,14 +27,14 @@ DistributedLockingTask::~DistributedLockingTask()
     delete mpDlm;
 }
 
-bool DistributedLockingTask::isLocked(::std::string const & resource)
+::fipa::distributed_locking::lock_state::LockState DistributedLockingTask::getLockState(::std::string const & resource)
 {
-    return mpDlm->isLocked(resource);
+    return mpDlm->getLockState(resource);
 }
 
-void DistributedLockingTask::lock(::std::string const & resource)
+void DistributedLockingTask::lock(::std::string const & resource, ::std::vector< ::fipa::Agent > const & agents)
 {
-    mpDlm->lock(resource);
+    mpDlm->lock(resource, std::list<fipa::Agent> (agents.begin(), agents.end()));
     trigger();
 }
 
