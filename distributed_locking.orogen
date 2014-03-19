@@ -38,12 +38,16 @@ task_context "DistributedLockingTask" do
     operation("getAgent").
         returns("fipa/Agent").
         doc("Returns the agent managed by the underlying dlm.")
+    
+    operation("setOwnedResources").
+        argument("resources", "/std/vector</std/string>", "the resources this agents owns").
+        doc("Sets the resources owned by this agent. Should ideally only be called once at the beginning.")
 end
 
 deployment "dlm_test" do
     do_not_install
     (0..4).each do |i|
         task("dlm_#{i}", "distributed_locking::DistributedLockingTask")
-        #.periodic(0.1) # WHY?
+#        .periodic(0.1)
     end
 end
