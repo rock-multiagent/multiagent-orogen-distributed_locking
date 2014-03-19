@@ -39,16 +39,21 @@ DistributedLockingTask::~DistributedLockingTask()
 
 void DistributedLockingTask::lock(::std::string const & resource, ::std::vector< ::fipa::Agent > const & agents)
 {
-    RTT::log(RTT::Warning) << getAgent().identifier << " lock start" << RTT::endlog();
+    RTT::log(RTT::Warning) << getAgent().identifier << " lock " << resource << RTT::endlog();
     mpDlm->lock(resource, std::list<fipa::Agent> (agents.begin(), agents.end()));
     trigger();
-    RTT::log(RTT::Warning) << getAgent().identifier << " lock end" << RTT::endlog();
 }
 
 void DistributedLockingTask::unlock(::std::string const & resource)
 {
+    RTT::log(RTT::Warning) << getAgent().identifier << " unlock " << resource << RTT::endlog();
     mpDlm->unlock(resource);
     trigger();
+}
+
+void DistributedLockingTask::setOwnedResources(::std::vector< ::std::string > const & resources)
+{
+    mpDlm->setOwnedResources(resources);
 }
 
 /// The following lines are template definitions for the various state machine
@@ -76,7 +81,7 @@ bool DistributedLockingTask::startHook()
 void DistributedLockingTask::updateHook()
 {
     DistributedLockingTaskBase::updateHook();
-    RTT::log(RTT::Warning) << getAgent().identifier << " uH start" << RTT::endlog();
+    RTT::log(RTT::Info) << getAgent().identifier << " updateHook" << RTT::endlog();
     
     // Check if there is something on the input port
     fipa::SerializedLetter letterIn;
@@ -88,7 +93,7 @@ void DistributedLockingTask::updateHook()
         
         // Forward message to DLM
         mpDlm->onIncomingMessage(msgIn);
-        RTT::log(RTT::Warning) << getAgent().identifier << " uH in" << RTT::endlog();
+        RTT::log(RTT::Warning) << getAgent().identifier << " uH: new incoming message" << RTT::endlog();
     }
     
     // Get message from DLM if there is one
@@ -103,10 +108,8 @@ void DistributedLockingTask::updateHook()
         
         // Push to output port
         _lettersOut.write(letterOut);
-        RTT::log(RTT::Warning) << getAgent().identifier << " uH out" << RTT::endlog();
+        RTT::log(RTT::Warning) << getAgent().identifier << " uH: new outgoing message" << RTT::endlog();
     }
-    
-    RTT::log(RTT::Warning) << getAgent().identifier << " uH end" << RTT::endlog();
 }
 void DistributedLockingTask::errorHook()
 {

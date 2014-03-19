@@ -45,6 +45,10 @@ namespace distributed_locking {
         /* Tries to lock the resource. isLocked has to be called subsequently to check the status.
          */
         virtual void lock(::std::string const & resource, ::std::vector< ::fipa::Agent > const & agents);
+        
+        /* Sets the resources owned by this agent. Should ideally only be called once at the beginning.
+         */
+        virtual void setOwnedResources(::std::vector< ::std::string > const & resources);
 
         /* Unlocks the resource.
          */
