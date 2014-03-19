@@ -4,8 +4,18 @@ include Orocos
 Orocos.initialize
 
 # Test for Ricart-Agrawala
-Orocos.run "dlm_test" do  
+Orocos.run "dlm_test", "fipa_services_test"  do  
     puts "Testing Ricart-Agrawala"
+    
+    # Start a mts for the communication
+    begin
+        mts_module = TaskContext.get "mts_0"
+    rescue Orocos::NotFound
+        print 'Deployment not found.'
+        raise
+    end
+    mts_module.configure
+    mts_module.start
     
     agent1 = TaskContext.get "dlm_0"
     agent2 = TaskContext.get "dlm_1"
@@ -16,13 +26,27 @@ Orocos.run "dlm_test" do
     agent2.apply_conf_file("distributed_locking_config.yml", ["ricart-agrawala", "agent2"])
     agent3.apply_conf_file("distributed_locking_config.yml", ["ricart-agrawala", "agent3"])
     
-    # connect agents
-    agent1.lettersOut.connect_to agent2.lettersIn, :type => :buffer, :size => 100
-    agent1.lettersOut.connect_to agent3.lettersIn, :type => :buffer, :size => 100
-    agent2.lettersOut.connect_to agent1.lettersIn, :type => :buffer, :size => 100
-    agent2.lettersOut.connect_to agent3.lettersIn, :type => :buffer, :size => 100
-    agent3.lettersOut.connect_to agent1.lettersIn, :type => :buffer, :size => 100
-    agent3.lettersOut.connect_to agent2.lettersIn, :type => :buffer, :size => 100
+    # register agents in the mts instead of connecting directly
+    mts_module.addReceiver("agent1", true)
+    mts_module.addReceiver("agent2", true)
+    mts_module.addReceiver("agent3", true)
+    # sleep so they can get published in avahi-discover
+    sleep 2
+    # and connect them to the mts ports
+    agent1.lettersOut.connect_to mts_module.letters, :type => :buffer, :size => 100
+    agent2.lettersOut.connect_to mts_module.letters, :type => :buffer, :size => 100
+    agent3.lettersOut.connect_to mts_module.letters, :type => :buffer, :size => 100
+    mts_module.agent1.connect_to agent1.lettersIn, :type => :buffer, :size => 100
+    mts_module.agent2.connect_to agent2.lettersIn, :type => :buffer, :size => 100
+    mts_module.agent3.connect_to agent3.lettersIn, :type => :buffer, :size => 100
+    
+    # this would be to connect the agents without MessageTransportTask
+    #agent1.lettersOut.connect_to agent2.lettersIn, :type => :buffer, :size => 100
+    #agent1.lettersOut.connect_to agent3.lettersIn, :type => :buffer, :size => 100
+    #agent2.lettersOut.connect_to agent1.lettersIn, :type => :buffer, :size => 100
+    #agent2.lettersOut.connect_to agent3.lettersIn, :type => :buffer, :size => 100
+    #agent3.lettersOut.connect_to agent1.lettersIn, :type => :buffer, :size => 100
+    #agent3.lettersOut.connect_to agent2.lettersIn, :type => :buffer, :size => 100
 
     # Call to configure is required for this component
     # since it has been generated with 'needs_configuration'
@@ -95,8 +119,18 @@ Orocos.run "dlm_test" do
 end
 
 # Test for Suzuki-Kasami
-Orocos.run "dlm_test" do  
+Orocos.run "dlm_test", "fipa_services_test" do  
     puts "Testing Suzuki-Kasami"
+    
+    # Start a mts for the communication
+    begin
+        mts_module = TaskContext.get "mts_0"
+    rescue Orocos::NotFound
+        print 'Deployment not found.'
+        raise
+    end
+    mts_module.configure
+    mts_module.start
     
     agent1 = TaskContext.get "dlm_0"
     agent2 = TaskContext.get "dlm_1"
@@ -107,13 +141,27 @@ Orocos.run "dlm_test" do
     agent2.apply_conf_file("distributed_locking_config.yml", ["suzuki-kasami", "agent2"])
     agent3.apply_conf_file("distributed_locking_config.yml", ["suzuki-kasami", "agent3"])
     
-    # connect agents
-    agent1.lettersOut.connect_to agent2.lettersIn, :type => :buffer, :size => 100
-    agent1.lettersOut.connect_to agent3.lettersIn, :type => :buffer, :size => 100
-    agent2.lettersOut.connect_to agent1.lettersIn, :type => :buffer, :size => 100
-    agent2.lettersOut.connect_to agent3.lettersIn, :type => :buffer, :size => 100
-    agent3.lettersOut.connect_to agent1.lettersIn, :type => :buffer, :size => 100
-    agent3.lettersOut.connect_to agent2.lettersIn, :type => :buffer, :size => 100
+    # register agents in the mts instead of connecting directly
+    mts_module.addReceiver("agent1", true)
+    mts_module.addReceiver("agent2", true)
+    mts_module.addReceiver("agent3", true)
+    # sleep so they can get published in avahi-discover
+    sleep 2
+    # and connect them to the mts ports
+    agent1.lettersOut.connect_to mts_module.letters, :type => :buffer, :size => 100
+    agent2.lettersOut.connect_to mts_module.letters, :type => :buffer, :size => 100
+    agent3.lettersOut.connect_to mts_module.letters, :type => :buffer, :size => 100
+    mts_module.agent1.connect_to agent1.lettersIn, :type => :buffer, :size => 100
+    mts_module.agent2.connect_to agent2.lettersIn, :type => :buffer, :size => 100
+    mts_module.agent3.connect_to agent3.lettersIn, :type => :buffer, :size => 100
+    
+    # this would be to connect the agents without MessageTransportTask
+    #agent1.lettersOut.connect_to agent2.lettersIn, :type => :buffer, :size => 100
+    #agent1.lettersOut.connect_to agent3.lettersIn, :type => :buffer, :size => 100
+    #agent2.lettersOut.connect_to agent1.lettersIn, :type => :buffer, :size => 100
+    #agent2.lettersOut.connect_to agent3.lettersIn, :type => :buffer, :size => 100
+    #agent3.lettersOut.connect_to agent1.lettersIn, :type => :buffer, :size => 100
+    #agent3.lettersOut.connect_to agent2.lettersIn, :type => :buffer, :size => 100
 
     # Call to configure is required for this component
     # since it has been generated with 'needs_configuration'
