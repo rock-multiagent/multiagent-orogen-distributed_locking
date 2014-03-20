@@ -11,8 +11,12 @@ import_types_from "base"
 task_context "DistributedLockingTask" do
     needs_configuration
     
-    property "self", "fipa/Agent"
-    property "protocol", "fipa/distributed_locking/protocol/Protocol"
+    property("self", "fipa/Agent").
+        doc("The agent managed by this task.")
+    property("protocol", "fipa/distributed_locking/protocol/Protocol").
+        doc("The dlm protocol which should be used.")
+    property("ownedResources", "std/vector<std/string>").
+        doc("The physically owned resources of the agent at start time.")
 
     output_port("lettersOut", "/fipa/SerializedLetter").
         doc("Output port for FIPA letters, that will be sent by the MTS")
@@ -38,10 +42,6 @@ task_context "DistributedLockingTask" do
     operation("getAgent").
         returns("fipa/Agent").
         doc("Returns the agent managed by the underlying dlm.")
-    
-    operation("setOwnedResources").
-        argument("resources", "/std/vector</std/string>", "the resources this agents owns").
-        doc("Sets the resources owned by this agent. Should ideally only be called once at the beginning.")
 end
 
 deployment "dlm_test" do

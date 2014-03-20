@@ -22,7 +22,7 @@ Orocos.run "dlm_test", "fipa_services_test"  do
     agent3 = TaskContext.get "dlm_2"
 
     # load property from configuration file
-    agent1.apply_conf_file("distributed_locking_config.yml", ["ricart-agrawala", "agent1"])
+    agent1.apply_conf_file("distributed_locking_config.yml", ["ricart-agrawala", "agent1", "rsc1"])
     agent2.apply_conf_file("distributed_locking_config.yml", ["ricart-agrawala", "agent2"])
     agent3.apply_conf_file("distributed_locking_config.yml", ["ricart-agrawala", "agent3"])
     
@@ -59,9 +59,7 @@ Orocos.run "dlm_test", "fipa_services_test"  do
     agent2.start
     agent3.start
     
-    resource = 'resource'
-    # Agent1 owns the resource
-    agent1.setOwnedResources([resource])
+    resource = 'rsc1' # This is important due to the configuration with rsc1
 
     # Now we lock
     agent1.lock(resource, [agent2.getAgent, agent3.getAgent])
@@ -137,7 +135,7 @@ Orocos.run "dlm_test", "fipa_services_test" do
     agent3 = TaskContext.get "dlm_2"
 
     # load property from configuration file
-    agent1.apply_conf_file("distributed_locking_config.yml", ["suzuki-kasami", "agent1"])
+    agent1.apply_conf_file("distributed_locking_config.yml", ["suzuki-kasami", "agent1", "rsc1"])
     agent2.apply_conf_file("distributed_locking_config.yml", ["suzuki-kasami", "agent2"])
     agent3.apply_conf_file("distributed_locking_config.yml", ["suzuki-kasami", "agent3"])
     
@@ -174,9 +172,7 @@ Orocos.run "dlm_test", "fipa_services_test" do
     agent2.start
     agent3.start
     
-    resource = 'resource'
-    # Agent1 owns the resource
-    agent1.setOwnedResources([resource])
+    resource = 'rsc1' # This is important due to the configuration with rsc1
 
     # Now we lock
     agent1.lock(resource, [agent2.getAgent, agent3.getAgent])

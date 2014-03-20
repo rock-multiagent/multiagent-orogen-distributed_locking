@@ -3,7 +3,6 @@
 #include "DistributedLockingTask.hpp"
 
 #include <distributed_locking/DLM.hpp>
-#include <distributed_locking/RicartAgrawala.hpp>
 
 using namespace distributed_locking;
 
@@ -25,7 +24,7 @@ DistributedLockingTask::~DistributedLockingTask()
 
 ::fipa::Agent DistributedLockingTask::getAgent()
 {
-    // RTT::log(RTT::Warning) << "asdfjkasldj" << RTT::endlog()
+    // RTT::log(RTT::Warning) << "bla" << RTT::endlog()
     // in shell:
     // export ORO_LOGLEVEL=5 
     // um Info log zu sehen, maximal 6  für Debug
@@ -51,11 +50,6 @@ void DistributedLockingTask::unlock(::std::string const & resource)
     trigger();
 }
 
-void DistributedLockingTask::setOwnedResources(::std::vector< ::std::string > const & resources)
-{
-    mpDlm->setOwnedResources(resources);
-}
-
 /// The following lines are template definitions for the various state machine
 // hooks defined by Orocos::RTT. See DistributedLockingTask.hpp for more detailed
 // documentation about them.
@@ -67,7 +61,8 @@ bool DistributedLockingTask::configureHook()
     
     fipa::Agent self = _self.get();
     fipa::distributed_locking::protocol::Protocol protocol = _protocol.get();
-    mpDlm = fipa::distributed_locking::DLM::dlmFactory(protocol, self);
+    std::vector<std::string> ownedResources = _ownedResources.get();
+    mpDlm = fipa::distributed_locking::DLM::dlmFactory(protocol, self, ownedResources);
     
     return true;
 }
