@@ -72,6 +72,9 @@ Orocos.run "dlm_test", "fipa_services_test"  do
     
     # Agent two tries to lock
     agent2.lock(resource, [agent1.getAgent, agent3.getAgent])
+    # TODO without this sometimes a2 does not know a1 owns rsc1 when calling lockObtained
+    #sleep 0.5
+    
     # agent 1 release
     agent1.unlock(resource)
     
@@ -185,6 +188,9 @@ Orocos.run "dlm_test", "fipa_services_test" do
     
     # Agent two tries to lock
     agent2.lock(resource, [agent1.getAgent, agent3.getAgent])
+    # TODO without this sometimes a2 does not know a1 owns rsc1 when calling lockObtained
+    #sleep 0.5 
+    
     # agent 1 release
     agent1.unlock(resource)
     

@@ -14,7 +14,7 @@ DistributedLockingTask::DistributedLockingTask(std::string const& name)
 
 DistributedLockingTask::DistributedLockingTask(std::string const& name, RTT::ExecutionEngine* engine)
     : DistributedLockingTaskBase(name, engine)
-   , mpDlm(0)
+    , mpDlm(0)
 {
 }
 
@@ -26,7 +26,7 @@ DistributedLockingTask::~DistributedLockingTask()
 {
     // RTT::log(RTT::Warning) << "bla" << RTT::endlog()
     // in shell:
-    // export ORO_LOGLEVEL=5 
+    // export ORO_LOGLEVEL=5
     // um Info log zu sehen, maximal 6  für Debug
     return mpDlm->getSelf();
 }
@@ -58,12 +58,12 @@ bool DistributedLockingTask::configureHook()
 {
     if (! DistributedLockingTaskBase::configureHook())
         return false;
-    
+
     fipa::Agent self = _self.get();
     fipa::distributed_locking::protocol::Protocol protocol = _protocol.get();
     std::vector<std::string> ownedResources = _ownedResources.get();
     mpDlm = fipa::distributed_locking::DLM::dlmFactory(protocol, self, ownedResources);
-    
+
     return true;
 }
 bool DistributedLockingTask::startHook()
@@ -77,7 +77,7 @@ void DistributedLockingTask::updateHook()
 {
     DistributedLockingTaskBase::updateHook();
     RTT::log(RTT::Info) << getAgent().identifier << " updateHook" << RTT::endlog();
-    
+
     // Check if there is something on the input port
     fipa::SerializedLetter letterIn;
     while(_lettersIn.read(letterIn) == RTT::NewData)
@@ -85,22 +85,21 @@ void DistributedLockingTask::updateHook()
         // Convert back
         fipa::acl::ACLEnvelope envelopeIn = letterIn.deserialize();
         fipa::acl::ACLMessage msgIn = envelopeIn.getACLMessage();
-        
+
         // Forward message to DLM
         mpDlm->onIncomingMessage(msgIn);
         RTT::log(RTT::Warning) << getAgent().identifier << " uH: new incoming message" << RTT::endlog();
     }
-    
+
     // Get message from DLM if there is one
     while(mpDlm->hasOutgoingMessages())
     {
         fipa::acl::ACLMessage msgOut =  mpDlm->popNextOutgoingMessage();
-        
         // Convert to letter.
         fipa::acl::ACLEnvelope envelopeOut (msgOut, fipa::acl::representation::BITEFFICIENT);
         // fipa::acl::ACLEnvelope is the same as fipa::acl::Letter
         fipa::SerializedLetter letterOut (envelopeOut, fipa::acl::representation::BITEFFICIENT);
-        
+
         // Push to output port
         _lettersOut.write(letterOut);
         RTT::log(RTT::Warning) << getAgent().identifier << " uH: new outgoing message" << RTT::endlog();
@@ -117,6 +116,6 @@ void DistributedLockingTask::stopHook()
 void DistributedLockingTask::cleanupHook()
 {
     DistributedLockingTaskBase::cleanupHook();
-    
+
     delete mpDlm;
 }
