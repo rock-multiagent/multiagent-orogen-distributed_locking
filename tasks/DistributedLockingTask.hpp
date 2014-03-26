@@ -50,7 +50,6 @@ namespace distributed_locking {
          */
         virtual void unlock(::std::string const & resource);
 
-
     public:
         /** TaskContext constructor for DistributedLockingTask
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.

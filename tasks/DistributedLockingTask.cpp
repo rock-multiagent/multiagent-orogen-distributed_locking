@@ -40,14 +40,30 @@ void DistributedLockingTask::lock(::std::string const & resource, ::std::vector<
 {
     RTT::log(RTT::Warning) << getAgent().identifier << " lock " << resource << RTT::endlog();
     mpDlm->lock(resource, std::list<fipa::Agent> (agents.begin(), agents.end()));
-    trigger();
+    //trigger();
+    if(!this->getActivity()->trigger())
+    {
+        RTT::log(RTT::Error) << "trigger did not work." << RTT::endlog();
+    }
+    else
+    {
+        RTT::log(RTT::Error) << "trigger worked." << RTT::endlog();
+    }
 }
 
 void DistributedLockingTask::unlock(::std::string const & resource)
 {
     RTT::log(RTT::Warning) << getAgent().identifier << " unlock " << resource << RTT::endlog();
     mpDlm->unlock(resource);
-    trigger();
+    //trigger();
+    if(!this->getActivity()->trigger())
+    {
+        RTT::log(RTT::Error) << "trigger did not work." << RTT::endlog();
+    }
+    else
+    {
+        RTT::log(RTT::Error) << "trigger worked." << RTT::endlog();
+    }
 }
 
 /// The following lines are template definitions for the various state machine
@@ -77,6 +93,9 @@ void DistributedLockingTask::updateHook()
 {
     DistributedLockingTaskBase::updateHook();
     RTT::log(RTT::Info) << getAgent().identifier << " updateHook" << RTT::endlog();
+    
+    // Don't forget to call to the library's trigger method, that requires to be called periodically
+    mpDlm->trigger();
 
     // Check if there is something on the input port
     fipa::SerializedLetter letterIn;
