@@ -16,6 +16,8 @@ self:
 # Protocols
 --- name:ricart-agrawala
 protocol: :RICART_AGRAWALA
+--- name:ricart-agrawala-extended
+protocol: :RICART_AGRAWALA_EXTENDED
 --- name:suzuki-kasami
 protocol: :SUZUKI_KASAMI
 
