@@ -4,7 +4,7 @@ include Orocos
 Orocos.initialize
 
 # Test for Ricart-Agrawala Extended
-Orocos.run "dlm_test", "fipa_services_test"  do  
+Orocos.run "dlm_test", "fipa_services_test", :valgrind => false  do  
     puts "Testing Ricart-Agrawala Extended"
     
     # Start a mts for the communication
@@ -76,6 +76,9 @@ Orocos.run "dlm_test", "fipa_services_test"  do
     
     # Now, agent 3 dies
     agent3.stop
+    # Disconnecting instead of stopping results in failure messages from mts => not desired.
+    #agent3.lettersOut.disconnect_from mts_module.letters
+    #mts_module.agent3.disconnect_from agent3.lettersIn
     
     # After the timeout, agent 2 should hold the lock
     while (status = agent2.getLockState(resource)).to_s == "INTERESTED"
@@ -102,7 +105,10 @@ Orocos.run "dlm_test", "fipa_services_test"  do
     sleep 1
     
     # Agent 1 dies
-    agent1.stop
+    #agent1.stop
+    agent1.lettersOut.disconnect_from mts_module.letters
+    mts_module.agent1.disconnect_from agent1.lettersIn
+    
     
     # Now, after the timeout, agent2 should have switched into the UNREACHABLE state for that resource
     while (status = agent2.getLockState(resource)).to_s == "UNREACHABLE"
