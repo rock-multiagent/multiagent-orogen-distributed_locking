@@ -32,11 +32,11 @@ namespace distributed_locking {
     {
 	friend class DistributedLockingTaskBase;
     protected:
-        fipa::distributed_locking::DLM* mpDlm;
+        boost::shared_ptr<fipa::distributed_locking::DLM> mpDlm;
         
-        /* Returns the agent managed by the underlying dlm.
+        /* Returns the agent name managed by the underlying dlm
          */
-        virtual ::fipa::Agent getAgent();
+        virtual ::std::string getAgent();
         
         /* Gets the lock state for the given resource.
          */
@@ -44,7 +44,7 @@ namespace distributed_locking {
 
         /* Tries to lock the resource. isLocked has to be called subsequently to check the status.
          */
-        virtual void lock(::std::string const & resource, ::std::vector< ::fipa::Agent > const & agents);
+        virtual void lock(::std::string const & resource, ::std::vector< ::std::string > const & agents);
 
         /* Unlocks the resource.
          */

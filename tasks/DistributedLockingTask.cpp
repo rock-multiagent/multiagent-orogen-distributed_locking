@@ -1,20 +1,19 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
 
 #include "DistributedLockingTask.hpp"
-
 #include <distributed_locking/DLM.hpp>
 
 using namespace distributed_locking;
 
 DistributedLockingTask::DistributedLockingTask(std::string const& name)
     : DistributedLockingTaskBase(name)
-    , mpDlm(0)
+    , mpDlm()
 {
 }
 
 DistributedLockingTask::DistributedLockingTask(std::string const& name, RTT::ExecutionEngine* engine)
     : DistributedLockingTaskBase(name, engine)
-    , mpDlm(0)
+    , mpDlm()
 {
 }
 
@@ -22,13 +21,9 @@ DistributedLockingTask::~DistributedLockingTask()
 {
 }
 
-::fipa::Agent DistributedLockingTask::getAgent()
+std::string DistributedLockingTask::getAgent()
 {
-    // RTT::log(RTT::Warning) << "bla" << RTT::endlog()
-    // in shell:
-    // export ORO_LOGLEVEL=5
-    // um Info log zu sehen, maximal 6  für Debug
-    return mpDlm->getSelf();
+    return mpDlm->getSelf().getName();
 }
 
 ::fipa::distributed_locking::lock_state::LockState DistributedLockingTask::getLockState(::std::string const & resource)
@@ -36,20 +31,24 @@ DistributedLockingTask::~DistributedLockingTask()
     return mpDlm->getLockState(resource);
 }
 
-void DistributedLockingTask::lock(::std::string const & resource, ::std::vector< ::fipa::Agent > const & agents)
+void DistributedLockingTask::lock(::std::string const & resource, ::std::vector<std::string> const & agents)
 {
-    RTT::log(RTT::Warning) << getAgent().identifier << " lock " << resource << RTT::endlog();
-    mpDlm->lock(resource, std::list<fipa::Agent> (agents.begin(), agents.end()));
-    updateHook();
-    //trigger();
+    RTT::log(RTT::Warning) << getAgent() << " lock " << resource << RTT::endlog();
+
+    std::list<fipa::acl::AgentID> agentList;
+    std::vector<std::string>::const_iterator cit = agents.begin();
+    for(; cit != agents.end(); ++cit)
+    {
+        fipa::acl::AgentID agent(*cit);
+        agentList.push_back(agent);
+    }
+    mpDlm->lock(resource, agentList);
 }
 
 void DistributedLockingTask::unlock(::std::string const & resource)
 {
-    RTT::log(RTT::Warning) << getAgent().identifier << " unlock " << resource << RTT::endlog();
+    RTT::log(RTT::Warning) << getAgent() << " unlock " << resource << RTT::endlog();
     mpDlm->unlock(resource);
-    updateHook();
-    //trigger();
 }
 
 /// The following lines are template definitions for the various state machine
@@ -61,10 +60,17 @@ bool DistributedLockingTask::configureHook()
     if (! DistributedLockingTaskBase::configureHook())
         return false;
 
-    fipa::Agent self = _self.get();
+    std::string agentName = _self.get();
+    if(agentName.empty())
+    {
+        RTT::log(RTT::Warning) << "Agent name cannot be empty" << RTT::endlog();
+        return false;
+    }
+
+    fipa::acl::AgentID self(agentName);
     fipa::distributed_locking::protocol::Protocol protocol = _protocol.get();
-    std::vector<std::string> ownedResources = _ownedResources.get();
-    mpDlm = fipa::distributed_locking::DLM::dlmFactory(protocol, self, ownedResources);
+    std::vector<std::string> ownedResources = _owned_resources.get();
+    mpDlm = fipa::distributed_locking::DLM::create(protocol, self, ownedResources);
 
     return true;
 }
@@ -78,14 +84,14 @@ bool DistributedLockingTask::startHook()
 void DistributedLockingTask::updateHook()
 {
     DistributedLockingTaskBase::updateHook();
-    RTT::log(RTT::Info) << getAgent().identifier << " updateHook" << RTT::endlog();
+    RTT::log(RTT::Info) << getAgent() << " updateHook" << RTT::endlog();
     
     // Don't forget to call to the library's trigger method, that requires to be called periodically
     mpDlm->trigger();
 
     // Check if there is something on the input port
     fipa::SerializedLetter letterIn;
-    while(_lettersIn.read(letterIn) == RTT::NewData)
+    while(_letters_in.read(letterIn) == RTT::NewData)
     {
         // Convert back
         fipa::acl::ACLEnvelope envelopeIn = letterIn.deserialize();
@@ -93,7 +99,7 @@ void DistributedLockingTask::updateHook()
 
         // Forward message to DLM
         mpDlm->onIncomingMessage(msgIn);
-        RTT::log(RTT::Warning) << getAgent().identifier << " uH: new incoming message" << RTT::endlog();
+        RTT::log(RTT::Warning) << getAgent() << " updateHook: new incoming message" << RTT::endlog();
     }
 
     // Get message from DLM if there is one
@@ -106,8 +112,8 @@ void DistributedLockingTask::updateHook()
         fipa::SerializedLetter letterOut (envelopeOut, fipa::acl::representation::BITEFFICIENT);
 
         // Push to output port
-        _lettersOut.write(letterOut);
-        RTT::log(RTT::Warning) << getAgent().identifier << " uH: new outgoing message" << RTT::endlog();
+        _letters_out.write(letterOut);
+        RTT::log(RTT::Warning) << getAgent() << " updateHook: new outgoing message" << RTT::endlog();
     }
 }
 void DistributedLockingTask::errorHook()
@@ -121,6 +127,4 @@ void DistributedLockingTask::stopHook()
 void DistributedLockingTask::cleanupHook()
 {
     DistributedLockingTaskBase::cleanupHook();
-
-    delete mpDlm;
 }
