@@ -35,14 +35,14 @@ void DistributedLockingTask::lock(::std::string const & resource, ::std::vector<
 {
     RTT::log(RTT::Warning) << getAgent() << " lock " << resource << RTT::endlog();
 
-    std::list<fipa::acl::AgentID> agentList;
+    std::vector<fipa::acl::AgentID> agentList;
     std::vector<std::string>::const_iterator cit = agents.begin();
     for(; cit != agents.end(); ++cit)
     {
         fipa::acl::AgentID agent(*cit);
         agentList.push_back(agent);
     }
-    mpDlm->lock(resource, agentList);
+    mpDlm->fipa::distributed_locking::DLM::lock(resource, agentList);
 }
 
 void DistributedLockingTask::unlock(::std::string const & resource)
@@ -85,7 +85,7 @@ void DistributedLockingTask::updateHook()
 {
     DistributedLockingTaskBase::updateHook();
     RTT::log(RTT::Info) << getAgent() << " updateHook" << RTT::endlog();
-    
+
     // Don't forget to call to the library's trigger method, that requires to be called periodically
     mpDlm->trigger();
 

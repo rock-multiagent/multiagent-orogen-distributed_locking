@@ -4,12 +4,13 @@ using_library "distributed_locking"
 using_library "fipa_acl"
 using_task_library "fipa_services"
 
+import_types_from "base"
+
 import_types_from "distributed_locking/DLM.hpp"
-import_types_from "distributed_locking/Agent.hpp"
 
 task_context "DistributedLockingTask" do
     needs_configuration
-    
+
     property("self", "/std/string").
         doc("The agent managed by this task.")
     property("protocol", "/fipa/distributed_locking/protocol/Protocol").
@@ -22,22 +23,22 @@ task_context "DistributedLockingTask" do
     input_port("letters_in", "/fipa/SerializedLetter").
         doc("Input port for FIPA letters from the MTS")
     periodic(0.1)
-    
-    
+
+
     operation("lock").
-        argument("resource", "/std/string/", "the name of the resource").
+        argument("resource", "/std/string", "the name of the resource").
         argument("agents", "/std/vector</std/string>", "the agents to communicate with for this lock").
         doc("Tries to lock the resource. isLocked has to be called subsequently to check the status.")
-    
+
     operation("unlock").
-        argument("resource", "/std/string/", "the name of the resource").
+        argument("resource", "/std/string", "the name of the resource").
         doc("Unlocks the resource.")
-        
+
     operation("getLockState").
         returns("/fipa/distributed_locking/lock_state/LockState").
-        argument("resource", "/std/string/", "the name of the resource").
+        argument("resource", "/std/string", "the name of the resource").
         doc("Gets the lock state for the given resource.")
-    
+
     operation("getAgent").
         returns("/std/string").
         doc("Returns the agent managed by the underlying dlm.")

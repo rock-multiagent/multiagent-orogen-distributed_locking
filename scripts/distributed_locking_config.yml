@@ -1,17 +1,10 @@
 --- name:default
-# no documentation available for this property
-metadata:
-  metadata: []
-  properties: []
-  input_ports: []
-  output_ports: []
 # The physically owned resources of the agent at start time.
-ownedResources: []
+owned_resources: []
 # The dlm protocol which should be used.
 protocol: :PROTOCOL_START
 # The agent managed by this task.
-self:
-  identifier: 'agent1'
+self: 'agent1'
 
 # Protocols
 --- name:ricart-agrawala
@@ -23,25 +16,20 @@ protocol: :SUZUKI_KASAMI
 
 # Agents
 --- name:agent1
-self:
-  identifier: 'agent1'
+self: 'agent1'
 --- name:agent2
-self:
-  identifier: 'agent2'
+self: 'agent2'
 --- name:agent3
-self:
-  identifier: 'agent3'
+self: 'agent3'
 --- name:agent4
-self:
-  identifier: 'agent4'
+self: 'agent4'
 --- name:agent5
-self:
-  identifier: 'agent5'
+self: 'agent5'
   
 # Resourcsed
 --- name:rsc1
-ownedResources: ['rsc1']
+owned_resources: ['rsc1']
 --- name:rsc2
-ownedResources: ['rsc2']
+owned_resources: ['rsc2']
 --- name:rscs
-ownedResources: ['rsc1', 'rsc2']
+owned_resources: ['rsc1', 'rsc2']
