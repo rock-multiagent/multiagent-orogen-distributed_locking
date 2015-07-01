@@ -42,7 +42,7 @@ void DistributedLockingTask::lock(::std::string const & resource, ::std::vector<
         fipa::acl::AgentID agent(*cit);
         agentList.push_back(agent);
     }
-    mpDlm->fipa::distributed_locking::DLM::lock(resource, agentList);
+    mpDlm->lock(resource, agentList);
 }
 
 void DistributedLockingTask::unlock(::std::string const & resource)
