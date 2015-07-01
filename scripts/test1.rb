@@ -34,20 +34,20 @@ Orocos.run "distributed_locking::DistributedLockingTask" => ["dlm_0","dlm_1","dl
     # sleep so they can get published in avahi-discover
     sleep 2
     # and connect them to the mts ports
-    agent1.lettersOut.connect_to mts_module.letters, :type => :buffer, :size => 100
-    agent2.lettersOut.connect_to mts_module.letters, :type => :buffer, :size => 100
-    agent3.lettersOut.connect_to mts_module.letters, :type => :buffer, :size => 100
-    mts_module.agent1.connect_to agent1.lettersIn, :type => :buffer, :size => 100
-    mts_module.agent2.connect_to agent2.lettersIn, :type => :buffer, :size => 100
-    mts_module.agent3.connect_to agent3.lettersIn, :type => :buffer, :size => 100
+    agent1.letters_out.connect_to mts_module.letters, :type => :buffer, :size => 100
+    agent2.letters_out.connect_to mts_module.letters, :type => :buffer, :size => 100
+    agent3.letters_out.connect_to mts_module.letters, :type => :buffer, :size => 100
+    mts_module.agent1.connect_to agent1.letters_in, :type => :buffer, :size => 100
+    mts_module.agent2.connect_to agent2.letters_in, :type => :buffer, :size => 100
+    mts_module.agent3.connect_to agent3.letters_in, :type => :buffer, :size => 100
 
     # this would be to connect the agents without MessageTransportTask
-    #agent1.lettersOut.connect_to agent2.lettersIn, :type => :buffer, :size => 100
-    #agent1.lettersOut.connect_to agent3.lettersIn, :type => :buffer, :size => 100
-    #agent2.lettersOut.connect_to agent1.lettersIn, :type => :buffer, :size => 100
-    #agent2.lettersOut.connect_to agent3.lettersIn, :type => :buffer, :size => 100
-    #agent3.lettersOut.connect_to agent1.lettersIn, :type => :buffer, :size => 100
-    #agent3.lettersOut.connect_to agent2.lettersIn, :type => :buffer, :size => 100
+    #agent1.letters_out.connect_to agent2.letters_in, :type => :buffer, :size => 100
+    #agent1.letters_out.connect_to agent3.letters_in, :type => :buffer, :size => 100
+    #agent2.letters_out.connect_to agent1.letters_in, :type => :buffer, :size => 100
+    #agent2.letters_out.connect_to agent3.letters_in, :type => :buffer, :size => 100
+    #agent3.letters_out.connect_to agent1.letters_in, :type => :buffer, :size => 100
+    #agent3.letters_out.connect_to agent2.letters_in, :type => :buffer, :size => 100
 
     # Call to configure is required for this component
     # since it has been generated with 'needs_configuration'
@@ -148,20 +148,20 @@ Orocos.run "dlm_test", "fipa_services_test" do
     # sleep so they can get published in avahi-discover
     sleep 2
     # and connect them to the mts ports
-    agent1.lettersOut.connect_to mts_module.letters, :type => :buffer, :size => 100
-    agent2.lettersOut.connect_to mts_module.letters, :type => :buffer, :size => 100
-    agent3.lettersOut.connect_to mts_module.letters, :type => :buffer, :size => 100
-    mts_module.agent1.connect_to agent1.lettersIn, :type => :buffer, :size => 100
-    mts_module.agent2.connect_to agent2.lettersIn, :type => :buffer, :size => 100
-    mts_module.agent3.connect_to agent3.lettersIn, :type => :buffer, :size => 100
+    agent1.letters_out.connect_to mts_module.letters, :type => :buffer, :size => 100
+    agent2.letters_out.connect_to mts_module.letters, :type => :buffer, :size => 100
+    agent3.letters_out.connect_to mts_module.letters, :type => :buffer, :size => 100
+    mts_module.agent1.connect_to agent1.letters_in, :type => :buffer, :size => 100
+    mts_module.agent2.connect_to agent2.letters_in, :type => :buffer, :size => 100
+    mts_module.agent3.connect_to agent3.letters_in, :type => :buffer, :size => 100
 
     # this would be to connect the agents without MessageTransportTask
-    #agent1.lettersOut.connect_to agent2.lettersIn, :type => :buffer, :size => 100
-    #agent1.lettersOut.connect_to agent3.lettersIn, :type => :buffer, :size => 100
-    #agent2.lettersOut.connect_to agent1.lettersIn, :type => :buffer, :size => 100
-    #agent2.lettersOut.connect_to agent3.lettersIn, :type => :buffer, :size => 100
-    #agent3.lettersOut.connect_to agent1.lettersIn, :type => :buffer, :size => 100
-    #agent3.lettersOut.connect_to agent2.lettersIn, :type => :buffer, :size => 100
+    #agent1.letters_out.connect_to agent2.letters_in, :type => :buffer, :size => 100
+    #agent1.letters_out.connect_to agent3.letters_in, :type => :buffer, :size => 100
+    #agent2.letters_out.connect_to agent1.letters_in, :type => :buffer, :size => 100
+    #agent2.letters_out.connect_to agent3.letters_in, :type => :buffer, :size => 100
+    #agent3.letters_out.connect_to agent1.letters_in, :type => :buffer, :size => 100
+    #agent3.letters_out.connect_to agent2.letters_in, :type => :buffer, :size => 100
 
     # Call to configure is required for this component
     # since it has been generated with 'needs_configuration'
