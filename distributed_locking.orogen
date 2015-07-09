@@ -17,6 +17,8 @@ task_context "DistributedLockingTask" do
         doc("The dlm protocol which should be used.")
     property("owned_resources", "/std/vector<std/string>").
         doc("The physically owned resources of the agent at start time.")
+    property("resource_dir", "/std/string")
+        doc("The resource dir for the fipa acl Statemachine")
 
     output_port("letters_out", "/fipa/SerializedLetter").
         doc("Output port for FIPA letters, that will be sent by the MTS")
@@ -28,7 +30,7 @@ task_context "DistributedLockingTask" do
     operation("lock").
         argument("resource", "/std/string", "the name of the resource").
         argument("agents", "/std/vector</std/string>", "the agents to communicate with for this lock").
-        doc("Tries to lock the resource. isLocked has to be called subsequently to check the status.")
+        doc("Tries to lock the resource. Call discover and knownOwner before. isLocked has to be called subsequently to check the status.")
 
     operation("unlock").
         argument("resource", "/std/string", "the name of the resource").
@@ -42,4 +44,14 @@ task_context "DistributedLockingTask" do
     operation("getAgent").
         returns("/std/string").
         doc("Returns the agent managed by the underlying dlm.")
+
+    operation("discover").
+        argument("resource", "/std/string", "the name of the resource").
+        argument("agents", "/std/vector</std/string>", "the list of possible agents").
+        doc("Tries to discover the owner of the resource.")
+
+    operation("knownOwner").
+        returns("bool").
+        argument("resource", "std/string")
+        doc("Check if the owner of the resource is known. If it returns true, lock can be called.")
 end

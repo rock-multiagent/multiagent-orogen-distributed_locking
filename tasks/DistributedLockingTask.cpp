@@ -2,6 +2,7 @@
 
 #include "DistributedLockingTask.hpp"
 #include <distributed_locking/DLM.hpp>
+#include <base/logging.h>
 
 using namespace distributed_locking;
 
@@ -45,6 +46,25 @@ void DistributedLockingTask::lock(::std::string const & resource, ::std::vector<
     mpDlm->lock(resource, agentList);
 }
 
+void DistributedLockingTask::discover(::std::string const & resource, ::std::vector<std::string> const & agents)
+{
+    RTT::log(RTT::Warning) << getAgent() << " discover " << resource << RTT::endlog();
+
+    std::vector<fipa::acl::AgentID> agentList;
+    std::vector<std::string>::const_iterator cit = agents.begin();
+    for(; cit != agents.end(); ++cit)
+    {
+        fipa::acl::AgentID agent(*cit);
+        agentList.push_back(agent);
+    }
+    mpDlm->discover(resource, agentList);
+}
+
+bool DistributedLockingTask::knownOwner(::std::string const & resource)
+{
+  return mpDlm->hasKnownOwner(resource);
+}
+
 void DistributedLockingTask::unlock(::std::string const & resource)
 {
     RTT::log(RTT::Warning) << getAgent() << " unlock " << resource << RTT::endlog();
@@ -72,6 +92,7 @@ bool DistributedLockingTask::configureHook()
     std::vector<std::string> ownedResources = _owned_resources.get();
     mpDlm = fipa::distributed_locking::DLM::create(protocol, self, ownedResources);
 
+    fipa::acl::StateMachineFactory::prepareProtocolsFromResourceDir( _resource_dir.get() );
     return true;
 }
 bool DistributedLockingTask::startHook()

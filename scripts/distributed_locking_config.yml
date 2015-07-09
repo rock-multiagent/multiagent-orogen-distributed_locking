@@ -25,7 +25,11 @@ self: 'agent3'
 self: 'agent4'
 --- name:agent5
 self: 'agent5'
-  
+
+# Resources
+--- name:res_dir
+resource_dir: <%= "#{ENV['ROCK_PREFIX']}/../../fipa_acl/protocols" %>
+
 # Resourcsed
 --- name:rsc1
 owned_resources: ['rsc1']

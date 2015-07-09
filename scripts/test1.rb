@@ -23,9 +23,9 @@ Orocos.run "distributed_locking::DistributedLockingTask" => ["dlm_0","dlm_1","dl
     agent3 = TaskContext.get "dlm_2"
 
     # load property from configuration file
-    agent1.apply_conf_file("distributed_locking_config.yml", ["ricart-agrawala", "agent1", "rsc1"])
-    agent2.apply_conf_file("distributed_locking_config.yml", ["ricart-agrawala", "agent2"])
-    agent3.apply_conf_file("distributed_locking_config.yml", ["ricart-agrawala", "agent3"])
+    agent1.apply_conf_file("distributed_locking_config.yml", ["ricart-agrawala", "agent1", "rsc1", "res_dir"])
+    agent2.apply_conf_file("distributed_locking_config.yml", ["ricart-agrawala", "agent2", "res_dir"])
+    agent3.apply_conf_file("distributed_locking_config.yml", ["ricart-agrawala", "agent3", "res_dir"])
 
     # register agents in the mts instead of connecting directly
     mts_module.addReceiver("agent1", true)
@@ -51,17 +51,37 @@ Orocos.run "distributed_locking::DistributedLockingTask" => ["dlm_0","dlm_1","dl
 
     # Call to configure is required for this component
     # since it has been generated with 'needs_configuration'
+    puts "Configuring Agents"
     agent1.configure
     agent2.configure
     agent3.configure
 
+    puts "Starting Agents"
     # start them
     agent1.start
     agent2.start
     agent3.start
+    sleep 0.5
 
+    puts "Resource discovery"
     resource = 'rsc1' # This is important due to the configuration with rsc1
 
+    agent1.discover(resource, [agent2.getAgent, agent3.getAgent])
+    while !agent1.knownOwner(resource)
+        sleep 0.1
+    end
+
+    agent2.discover(resource, [agent1.getAgent, agent3.getAgent])
+    while !agent2.knownOwner(resource)
+        sleep 0.1
+    end
+
+    agent3.discover(resource, [agent2.getAgent, agent1.getAgent])
+    while !agent3.knownOwner(resource)
+        sleep 0.1
+    end
+
+    puts "Testing"
     # Now we lock
     agent1.lock(resource, [agent2.getAgent, agent3.getAgent])
     # And check it is being locked
@@ -119,7 +139,7 @@ Orocos.run "distributed_locking::DistributedLockingTask" => ["dlm_0","dlm_1","dl
 end
 
 # Test for Suzuki-Kasami
-Orocos.run "dlm_test", "fipa_services_test" do
+Orocos.run "distributed_locking::DistributedLockingTask" => ["dlm_0","dlm_1","dlm_2"], "fipa_services::MessageTransportTask" => 'mts_0' do
     puts "Testing Suzuki-Kasami"
 
     # Start a mts for the communication
@@ -137,9 +157,9 @@ Orocos.run "dlm_test", "fipa_services_test" do
     agent3 = TaskContext.get "dlm_2"
 
     # load property from configuration file
-    agent1.apply_conf_file("distributed_locking_config.yml", ["suzuki-kasami", "agent1", "rsc1"])
-    agent2.apply_conf_file("distributed_locking_config.yml", ["suzuki-kasami", "agent2"])
-    agent3.apply_conf_file("distributed_locking_config.yml", ["suzuki-kasami", "agent3"])
+    agent1.apply_conf_file("distributed_locking_config.yml", ["suzuki-kasami", "agent1", "rsc1", "res_dir"])
+    agent2.apply_conf_file("distributed_locking_config.yml", ["suzuki-kasami", "agent2", "res_dir"])
+    agent3.apply_conf_file("distributed_locking_config.yml", ["suzuki-kasami", "agent3", "res_dir"])
 
     # register agents in the mts instead of connecting directly
     mts_module.addReceiver("agent1", true)
@@ -165,17 +185,37 @@ Orocos.run "dlm_test", "fipa_services_test" do
 
     # Call to configure is required for this component
     # since it has been generated with 'needs_configuration'
+    puts "Configuring Agents"
     agent1.configure
     agent2.configure
     agent3.configure
 
+    puts "Starting Agents"
     # start them
     agent1.start
     agent2.start
     agent3.start
+    sleep 0.5
 
+    puts "Resource discovery"
     resource = 'rsc1' # This is important due to the configuration with rsc1
 
+    agent1.discover(resource, [agent2.getAgent, agent3.getAgent])
+    while !agent1.knownOwner(resource)
+        sleep 0.1
+    end
+
+    agent2.discover(resource, [agent1.getAgent, agent3.getAgent])
+    while !agent2.knownOwner(resource)
+        sleep 0.1
+    end
+
+    agent3.discover(resource, [agent2.getAgent, agent1.getAgent])
+    while !agent3.knownOwner(resource)
+        sleep 0.1
+    end
+
+    puts "Testing"
     # Now we lock
     agent1.lock(resource, [agent2.getAgent, agent3.getAgent])
     # And check it is being locked
