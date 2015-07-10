@@ -14,7 +14,7 @@ namespace fipa {
 
 namespace distributed_locking {
 
-    /*! \class DistributedLockingTask 
+    /*! \class DistributedLockingTask
      * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
      * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
      * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
@@ -26,18 +26,18 @@ namespace distributed_locking {
          task('custom_task_name','distributed_locking::DistributedLockingTask')
      end
      \endverbatim
-     *  It can be dynamically adapted when the deployment is called with a prefix argument. 
+     *  It can be dynamically adapted when the deployment is called with a prefix argument.
      */
     class DistributedLockingTask : public DistributedLockingTaskBase
     {
 	friend class DistributedLockingTaskBase;
     protected:
         boost::shared_ptr<fipa::distributed_locking::DLM> mpDlm;
-        
+
         /* Returns the agent name managed by the underlying dlm
          */
         virtual ::std::string getAgent();
-        
+
         /* Gets the lock state for the given resource.
          */
         virtual ::fipa::distributed_locking::lock_state::LockState getLockState(::std::string const & resource);
@@ -50,6 +50,14 @@ namespace distributed_locking {
          */
         virtual void unlock(::std::string const & resource);
 
+        /* Tries to discover the owner of the given resource
+         */
+        virtual void discover(::std::string const & resource, ::std::vector< ::std::string > const & agents);
+
+        /* Returns true if the owner of the resource is known.
+        */
+        virtual bool knownOwner(::std::string const & resource);
+
     public:
         /** TaskContext constructor for DistributedLockingTask
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
@@ -57,10 +65,10 @@ namespace distributed_locking {
          */
         DistributedLockingTask(std::string const& name = "distributed_locking::DistributedLockingTask");
 
-        /** TaskContext constructor for DistributedLockingTask 
-         * \param name Name of the task. This name needs to be unique to make it identifiable for nameservices. 
-         * \param engine The RTT Execution engine to be used for this task, which serialises the execution of all commands, programs, state machines and incoming events for a task. 
-         * 
+        /** TaskContext constructor for DistributedLockingTask
+         * \param name Name of the task. This name needs to be unique to make it identifiable for nameservices.
+         * \param engine The RTT Execution engine to be used for this task, which serialises the execution of all commands, programs, state machines and incoming events for a task.
+         *
          */
         DistributedLockingTask(std::string const& name, RTT::ExecutionEngine* engine);
 
@@ -97,7 +105,7 @@ namespace distributed_locking {
          *
          * The error(), exception() and fatal() calls, when called in this hook,
          * allow to get into the associated RunTimeError, Exception and
-         * FatalError states. 
+         * FatalError states.
          *
          * In the first case, updateHook() is still called, and recover() allows
          * you to go back into the Running state.  In the second case, the
@@ -128,4 +136,3 @@ namespace distributed_locking {
     };
 } // namespace distributed_locking
 #endif
-

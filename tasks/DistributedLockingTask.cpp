@@ -2,6 +2,7 @@
 
 #include "DistributedLockingTask.hpp"
 #include <distributed_locking/DLM.hpp>
+#include <base/logging.h>
 
 using namespace distributed_locking;
 
@@ -35,7 +36,7 @@ void DistributedLockingTask::lock(::std::string const & resource, ::std::vector<
 {
     RTT::log(RTT::Warning) << getAgent() << " lock " << resource << RTT::endlog();
 
-    std::list<fipa::acl::AgentID> agentList;
+    std::vector<fipa::acl::AgentID> agentList;
     std::vector<std::string>::const_iterator cit = agents.begin();
     for(; cit != agents.end(); ++cit)
     {
@@ -43,6 +44,25 @@ void DistributedLockingTask::lock(::std::string const & resource, ::std::vector<
         agentList.push_back(agent);
     }
     mpDlm->lock(resource, agentList);
+}
+
+void DistributedLockingTask::discover(::std::string const & resource, ::std::vector<std::string> const & agents)
+{
+    RTT::log(RTT::Warning) << getAgent() << " discover " << resource << RTT::endlog();
+
+    std::vector<fipa::acl::AgentID> agentList;
+    std::vector<std::string>::const_iterator cit = agents.begin();
+    for(; cit != agents.end(); ++cit)
+    {
+        fipa::acl::AgentID agent(*cit);
+        agentList.push_back(agent);
+    }
+    mpDlm->discover(resource, agentList);
+}
+
+bool DistributedLockingTask::knownOwner(::std::string const & resource)
+{
+  return mpDlm->hasKnownOwner(resource);
 }
 
 void DistributedLockingTask::unlock(::std::string const & resource)
@@ -72,6 +92,7 @@ bool DistributedLockingTask::configureHook()
     std::vector<std::string> ownedResources = _owned_resources.get();
     mpDlm = fipa::distributed_locking::DLM::create(protocol, self, ownedResources);
 
+    fipa::acl::StateMachineFactory::prepareProtocolsFromResourceDir( _resource_dir.get() );
     return true;
 }
 bool DistributedLockingTask::startHook()
@@ -85,7 +106,7 @@ void DistributedLockingTask::updateHook()
 {
     DistributedLockingTaskBase::updateHook();
     RTT::log(RTT::Info) << getAgent() << " updateHook" << RTT::endlog();
-    
+
     // Don't forget to call to the library's trigger method, that requires to be called periodically
     mpDlm->trigger();
 
